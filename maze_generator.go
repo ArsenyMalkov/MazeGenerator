@@ -52,7 +52,7 @@ func main() {
 			stack = append(stack, curCell)
 			unvisited -= 1
 			continue
-		} else if curCell.y+1 != 5 && len(maze[(curCell.y+1)*5+curCell.x-1].connected) == 0 {
+		} else if curCell.y+1 != 5 && len(maze[(curCell.y+1)*5+curCell.x].connected) == 0 {
 			curCell.connected = append(maze[curCell.y*5+curCell.x].connected, &maze[(curCell.y+1)*5+curCell.x])
 			curCell = &maze[(curCell.y+1)*5+curCell.x]
 			stack = append(stack, curCell)
@@ -63,5 +63,26 @@ func main() {
 		curCell, stack = stack[len(stack)-1], stack[:len(stack)-1]
 	}
 
-	fmt.Println(maze)
+	var prtMaze [(5 + 4) * (5 + 4)]string
+	for y := 0; y < 9; y++ {
+		for x := 0; x < 9; x++ {
+			prtMaze[y*9+x] = "*"
+		}
+	}
+	for y := 0; y < 5; y++ {
+		for x := 0; x < 5; x++ {
+			prtMaze[y*2*9+x*2] = "-"
+			for _, curCell := range maze[y*5+x].connected {
+				wx, wy := curCell.x-x, curCell.y-y
+				prtMaze[(y*2+wy)*9+x*2+wx] = "+"
+			}
+		}
+	}
+
+	for y := 0; y < 9; y++ {
+		for x := 0; x < 9; x++ {
+			fmt.Print(prtMaze[y*9+x])
+		}
+		fmt.Print("\n")
+	}
 }
