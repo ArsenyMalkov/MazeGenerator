@@ -1,8 +1,8 @@
 package main
 
 import "fmt"
-
-//import "math/rand"
+import "math/rand"
+import "time"
 
 type cell struct {
 	x         int
@@ -20,20 +20,18 @@ func main() {
 		for x := 0; x < 5; x++ {
 			maze[y*5+x].x = x
 			maze[y*5+x].y = y
-			//maze[y*5+x].walls = make([]cell, 1)
-			//maze[y*5+x].connected = append(maze[y*5+x].connected, &maze[y*5+x])
 		}
 	}
 
-	//curCell := maze[rand.Intn(5 * 5)]
-
 	var stack []*cell
 
-	curCell := &maze[0]
+	rand.Seed(time.Now().UnixNano())
+	curCell := &maze[rand.Intn(5*5)]
 	stack = append(stack, curCell)
 	unvisited := 5*5 - 1
 
 	for unvisited != 0 {
+
 		if curCell.x-1 != -1 && len(maze[curCell.y*5+curCell.x-1].connected) == 0 {
 			curCell.connected = append(maze[curCell.y*5+curCell.x].connected, &maze[curCell.y*5+curCell.x-1])
 			curCell = &maze[curCell.y*5+curCell.x-1]
