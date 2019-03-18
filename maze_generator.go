@@ -11,8 +11,8 @@ type cell struct {
 }
 
 func main() {
-	width := 3
-	height := 3
+	width := 5
+	height := 5
 
 	maze := make([]cell, width*height)
 
@@ -26,14 +26,13 @@ func main() {
 	var stack []*cell
 
 	rand.Seed(time.Now().UnixNano())
-	//r := rand.Intn(width * height)
-	r := 1
+	r := rand.Intn(width * height)
 	curCell := &maze[r]
 	fmt.Println(r)
 	stack = append(stack, curCell)
 	unvisited := width*height - 1
 
-	for unvisited > -1 {
+	for unvisited != 0 {
 		prtWidth, prtHeight := 2*width-1, 2*height-1
 		prtMaze := make([]string, prtWidth*prtHeight)
 		for y := 0; y < prtHeight; y++ {
@@ -57,28 +56,32 @@ func main() {
 			}
 			fmt.Print("\n")
 		}
-		fmt.Println("\n", curCell.x, curCell.y)
+		fmt.Println()
 		if curCell.x-1 != -1 && len(maze[curCell.y*width+curCell.x-1].connected) == 0 {
 			curCell.connected = append(maze[curCell.y*width+curCell.x].connected, &maze[curCell.y*width+curCell.x-1])
 			curCell = &maze[curCell.y*width+curCell.x-1]
+			curCell.connected = append(maze[curCell.y*width+curCell.x].connected, &maze[curCell.y*width+curCell.x+1])
 			stack = append(stack, curCell)
 			unvisited -= 1
 			continue
 		} else if curCell.x+1 != width && len(maze[curCell.y*width+curCell.x+1].connected) == 0 {
 			curCell.connected = append(maze[curCell.y*width+curCell.x].connected, &maze[curCell.y*width+curCell.x+1])
 			curCell = &maze[curCell.y*width+curCell.x+1]
+			curCell.connected = append(maze[curCell.y*width+curCell.x].connected, &maze[curCell.y*width+curCell.x-1])
 			stack = append(stack, curCell)
 			unvisited -= 1
 			continue
 		} else if curCell.y-1 != -1 && len(maze[(curCell.y-1)*width+curCell.x].connected) == 0 {
 			curCell.connected = append(maze[curCell.y*width+curCell.x].connected, &maze[(curCell.y-1)*width+curCell.x])
 			curCell = &maze[(curCell.y-1)*width+curCell.x]
+			curCell.connected = append(maze[curCell.y*width+curCell.x].connected, &maze[(curCell.y+1)*width+curCell.x])
 			stack = append(stack, curCell)
 			unvisited -= 1
 			continue
 		} else if curCell.y+1 != width && len(maze[(curCell.y+1)*width+curCell.x].connected) == 0 {
 			curCell.connected = append(maze[curCell.y*width+curCell.x].connected, &maze[(curCell.y+1)*width+curCell.x])
 			curCell = &maze[(curCell.y+1)*width+curCell.x]
+			curCell.connected = append(maze[curCell.y*width+curCell.x].connected, &maze[(curCell.y-1)*width+curCell.x])
 			stack = append(stack, curCell)
 			unvisited -= 1
 			continue
