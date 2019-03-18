@@ -87,7 +87,7 @@ func main() {
 			continue
 		}
 
-		curCell, stack = stack[len(stack)-1], stack[:len(stack)-1]
+		curCell, stack = stack[len(stack)-2], stack[:len(stack)-2]
 	}
 
 	prtWidth, prtHeight := 2*width-1, 2*height-1
