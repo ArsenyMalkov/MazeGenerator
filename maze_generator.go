@@ -1,10 +1,13 @@
 package main
 
-import "fmt"
-import "math/rand"
-import "time"
-import "os"
-import "strings"
+import (
+	"fmt"
+	"math/rand"
+	"os"
+	"strconv"
+	"strings"
+	"time"
+)
 
 type cell struct {
 	x         int
@@ -13,8 +16,14 @@ type cell struct {
 }
 
 func main() {
-	width := 5
-	height := 5
+	width, err := strconv.Atoi(os.Args[1])
+	if err != nil {
+		panic(err)
+	}
+	height, err := strconv.Atoi(os.Args[2])
+	if err != nil {
+		panic(err)
+	}
 
 	maze := make([]cell, width*height)
 
