@@ -3,6 +3,8 @@ package main
 import "fmt"
 import "math/rand"
 import "time"
+import "os"
+import "strings"
 
 type cell struct {
 	x         int
@@ -107,10 +109,23 @@ func main() {
 		}
 	}
 
+	f, err := os.Create("maze")
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+
+	f.WriteString(strings.Repeat("*", prtWidth+2) + "\n")
 	for y := 0; y < prtHeight; y++ {
+		f.WriteString("*")
 		for x := 0; x < prtWidth; x++ {
 			fmt.Print(prtMaze[y*prtWidth+x])
+			f.WriteString(prtMaze[y*prtWidth+x])
 		}
 		fmt.Print("\n")
+		f.WriteString("*\n")
 	}
+	f.WriteString(strings.Repeat("*", prtWidth+2) + "\n")
+
+	f.Sync()
 }
