@@ -25,6 +25,7 @@ func main() {
 		panic(err)
 	}
 
+	// Create the maze
 	maze := make([]cell, width*height)
 
 	for y := 0; y < height; y++ {
@@ -34,8 +35,10 @@ func main() {
 		}
 	}
 
+	// Implementing stack
 	var stack []*cell
 
+	// Choose rand cell
 	rand.Seed(time.Now().UnixNano())
 	r := rand.Intn(width * height)
 	curCell := &maze[r]
@@ -44,6 +47,7 @@ func main() {
 	unvisited := width*height - 1
 
 	for unvisited != 0 {
+		// outside walls
 		prtWidth, prtHeight := 2*width-1, 2*height-1
 		prtMaze := make([]string, prtWidth*prtHeight)
 		for y := 0; y < prtHeight; y++ {
@@ -51,6 +55,7 @@ func main() {
 				prtMaze[y*prtWidth+x] = "*"
 			}
 		}
+		// connected cells
 		for y := 0; y < height; y++ {
 			for x := 0; x < width; x++ {
 				prtMaze[y*2*prtWidth+x*2] = "-"
@@ -68,37 +73,35 @@ func main() {
 			fmt.Print("\n")
 		}
 		fmt.Println()
+
+		// Find directions
+		availCells := make([]*cell, 0, 4)
 		if curCell.x-1 != -1 && len(maze[curCell.y*width+curCell.x-1].connected) == 0 {
-			curCell.connected = append(maze[curCell.y*width+curCell.x].connected, &maze[curCell.y*width+curCell.x-1])
-			curCell = &maze[curCell.y*width+curCell.x-1]
-			curCell.connected = append(maze[curCell.y*width+curCell.x].connected, &maze[curCell.y*width+curCell.x+1])
-			stack = append(stack, curCell)
-			unvisited -= 1
-			continue
-		} else if curCell.x+1 != width && len(maze[curCell.y*width+curCell.x+1].connected) == 0 {
-			curCell.connected = append(maze[curCell.y*width+curCell.x].connected, &maze[curCell.y*width+curCell.x+1])
-			curCell = &maze[curCell.y*width+curCell.x+1]
-			curCell.connected = append(maze[curCell.y*width+curCell.x].connected, &maze[curCell.y*width+curCell.x-1])
-			stack = append(stack, curCell)
-			unvisited -= 1
-			continue
-		} else if curCell.y-1 != -1 && len(maze[(curCell.y-1)*width+curCell.x].connected) == 0 {
-			curCell.connected = append(maze[curCell.y*width+curCell.x].connected, &maze[(curCell.y-1)*width+curCell.x])
-			curCell = &maze[(curCell.y-1)*width+curCell.x]
-			curCell.connected = append(maze[curCell.y*width+curCell.x].connected, &maze[(curCell.y+1)*width+curCell.x])
-			stack = append(stack, curCell)
-			unvisited -= 1
-			continue
-		} else if curCell.y+1 != width && len(maze[(curCell.y+1)*width+curCell.x].connected) == 0 {
-			curCell.connected = append(maze[curCell.y*width+curCell.x].connected, &maze[(curCell.y+1)*width+curCell.x])
-			curCell = &maze[(curCell.y+1)*width+curCell.x]
-			curCell.connected = append(maze[curCell.y*width+curCell.x].connected, &maze[(curCell.y-1)*width+curCell.x])
-			stack = append(stack, curCell)
-			unvisited -= 1
+			availCells = append(availCells, &maze[curCell.y*width+curCell.x-1])
+		}
+		if curCell.x+1 != width && len(maze[curCell.y*width+curCell.x+1].connected) == 0 {
+			availCells = append(availCells, &maze[curCell.y*width+curCell.x+1])
+		}
+		if curCell.y-1 != -1 && len(maze[(curCell.y-1)*width+curCell.x].connected) == 0 {
+			availCells = append(availCells, &maze[(curCell.y-1)*width+curCell.x])
+		}
+		if curCell.y+1 != height && len(maze[(curCell.y+1)*width+curCell.x].connected) == 0 {
+			availCells = append(availCells, &maze[(curCell.y+1)*width+curCell.x])
+		}
+
+		// pop from stack
+		if len(availCells) < 1 {
+			curCell, stack = stack[len(stack)-2], stack[:len(stack)-2]
 			continue
 		}
 
-		curCell, stack = stack[len(stack)-2], stack[:len(stack)-2]
+		// connect
+		conCell := availCells[rand.Intn(len(availCells))]
+		curCell.connected = append(curCell.connected, conCell)
+		conCell.connected = append(conCell.connected, curCell)
+		stack = append(stack, conCell)
+		curCell = conCell
+		unvisited -= 1
 	}
 
 	prtWidth, prtHeight := 2*width-1, 2*height-1
@@ -110,10 +113,10 @@ func main() {
 	}
 	for y := 0; y < height; y++ {
 		for x := 0; x < width; x++ {
-			prtMaze[y*2*prtWidth+x*2] = "-"
+			prtMaze[y*2*prtWidth+x*2] = " " // -
 			for _, curCell := range maze[y*width+x].connected {
 				dx, dy := curCell.x-x, curCell.y-y
-				prtMaze[(y*2+dy)*prtWidth+x*2+dx] = "+"
+				prtMaze[(y*2+dy)*prtWidth+x*2+dx] = " " // +
 			}
 		}
 	}
